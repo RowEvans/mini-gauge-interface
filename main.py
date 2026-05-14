@@ -43,6 +43,17 @@ def drawGauge(surface, speed):
 
         pygame.draw.line(surface, gray, (x1, y1), (x2, y2))
 
+    label_font = pygame.font.Font("fonts/Jersey10Charted-Regular.ttf", 24)
+    for i in range(0, MAX_SPEED + 1, 20):
+        angle = speedToAngle(i)
+        label_radius = radius - 35
+        lx = center[0] + label_radius * math.cos(angle)
+        ly = center[1] - label_radius * math.sin(angle)
+
+        label = label_font.render(str(i), True, white)
+        label_rect = label.get_rect(center=(lx, ly))
+        surface.blit(label, label_rect)
+
     needle_angle = speedToAngle(speed) # 0.7854
     needle_length = radius - 30 # 170
     nx = center[0] + needle_length * math.cos(needle_angle) # 570
