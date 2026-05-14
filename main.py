@@ -14,6 +14,7 @@ black = (0, 0, 0)
 white = (255, 255, 255)
 gray = (200, 200, 200)
 red = (255, 0, 0)
+green = (0, 200, 100)
 
 #speedometer
 center = (400, 300)
@@ -70,6 +71,43 @@ def drawSpeedometer(surface, speed):
     surface.blit(speed_label, speed_rect)
 
 
+#tachometer
+MIN_RPM = 0
+MAX_RPM = 8000
+REDLINE_RPM = 6700
+BAR_WIDTH = 20
+BAR_HEIGHT = 400
+BAR_X = 100
+BAR_Y = 100
+
+def drawTachometer(surface, rpm):
+    pygame.draw.rect(surface, white, (BAR_X, BAR_Y, BAR_WIDTH, BAR_HEIGHT))
+
+    
+    #drawing redline area
+    redline_fill = int(BAR_HEIGHT * (6700/8000))
+    pygame.draw.rect(surface, white, (BAR_X, BAR_Y, BAR_WIDTH, redline_fill))
+
+    ratio = rpm / MAX_RPM
+    fill_height = int(BAR_HEIGHT * ratio)
+    fill_y = BAR_Y + BAR_HEIGHT - fill_height
+
+    if rpm >= REDLINE_RPM:
+        color = red
+    else:
+        color = green
+    
+    pygame.draw.rect(surface, color, (BAR_X, fill_y, BAR_WIDTH, fill_height))
+
+    label_font = pygame.font.Font("fonts/arcadeclassic.regular.ttf", 24)
+    title = label_font.render("RPM", True, white)
+    title_rect = title.get_rect(center=((BAR_X + BAR_WIDTH // 2), 80))
+    surface.blit(title, title_rect)
+
+
+
+
+rpm = 0
 speed = 0
 flip = 1
 debug_mode = False
@@ -85,6 +123,7 @@ while running:
 
     screen.fill(black)
     drawSpeedometer(screen, speed)
+    drawTachometer(screen, rpm)
     if debug_mode:
         drawGrid(screen)
         trackMouse(screen)
@@ -97,5 +136,6 @@ while running:
         flip = 1
     
     speed += flip
+    rpm += flip * 50
 
 pygame.quit()
