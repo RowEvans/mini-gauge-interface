@@ -1,10 +1,5 @@
 import pygame
 
-pygame.init()
-
-screen = pygame.display.set_mode((800, 600))
-pygame.display.set_caption("Mouse Tracker")
-
 black = (0, 0, 0)
 white = (255, 255, 255)
 gray = (150, 150, 150)
@@ -16,8 +11,8 @@ def drawGrid(surface):
         pygame.draw.line(surface, gray, (0, y), (surface.get_width(), y), 1)
 
 def trackMouse(surface):
-    mouse_pos = pygame.mouse.get_pos()
     font = pygame.font.Font(None, 24)
+    mouse_pos = pygame.mouse.get_pos()
     text = font.render(f"{mouse_pos}", True, white)
     coords = (mouse_pos[0], mouse_pos[1] - 10)
     text_rect = text.get_rect(topleft=coords)
@@ -25,16 +20,3 @@ def trackMouse(surface):
     pygame.draw.rect(surface, black, padded_rect)
     pygame.draw.rect(surface, white, padded_rect, width=2)
     surface.blit(text, coords)
-
-running = True
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    
-    screen.fill(black)
-    drawGrid(screen)
-    trackMouse(screen)
-    pygame.display.flip()
-
-pygame.quit()

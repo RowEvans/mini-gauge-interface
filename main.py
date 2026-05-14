@@ -1,5 +1,8 @@
 import pygame
+from mouseTracker import *
 import math
+
+pygame.init()
 
 screen = pygame.display.set_mode((800, 600))
 pygame.display.set_caption("Main Page")
@@ -13,7 +16,7 @@ gray = (200, 200, 200)
 red = (255, 0, 0)
 
 #speedometer
-center = (400, 400)
+center = (400, 300)
 radius = 200
 MIN_SPEED = 0
 MAX_SPEED = 120
@@ -22,7 +25,7 @@ MAX_ANGLE = 45
 
 def speedToAngle(speed):
     ratio = speed/MAX_SPEED
-    angle = MIN_ANGLE - ratio * (MIN_ANGLE - MAX_ANGLE) - 360 * (ratio > (MIN_ANGLE / 360)) #45
+    angle = MIN_ANGLE - ratio * (MIN_ANGLE - MAX_ANGLE)
     return math.radians(angle)
 
 def drawGauge(surface, speed):
@@ -43,13 +46,13 @@ def drawGauge(surface, speed):
     needle_angle = speedToAngle(speed) # 0.7854
     needle_length = radius - 30 # 170
     nx = center[0] + needle_length * math.cos(needle_angle) # 570
-    ny = center[1] + needle_length * math.sin(needle_angle) # 402
-    pygame.draw.line(surface, red, center, (nx, ny), 3)
+    ny = center[1] - needle_length * math.sin(needle_angle) # 402
+    pygame.draw.line(surface, red, center, (nx, ny), 5)
 
     pygame.draw.circle(surface, red, center, 8)
 
-speed = 80
-
+speed = 0
+flip = 1
 
 running = True
 while running:
@@ -59,7 +62,17 @@ while running:
 
     screen.fill(black)
     drawGauge(screen, speed)
+    drawGrid(screen)
+    trackMouse(screen)
     pygame.display.flip()
     clock.tick(60)
+
+    if speed > MAX_SPEED:
+        flip = -1
+    if speed < MIN_SPEED:
+        flip = 1
+    
+    speed += flip
+    
 
 pygame.quit()
