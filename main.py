@@ -9,6 +9,9 @@ pygame.display.set_caption("Main Page")
 
 clock = pygame.time.Clock()
 
+#font
+font = pygame.font.Font("fonts/arcadeclassic.regular.ttf", 24)
+
 #colors
 black = (0, 0, 0)
 white = (255, 255, 255)
@@ -46,14 +49,13 @@ def drawSpeedometer(surface, speed):
 
         pygame.draw.line(surface, gray, (x1, y1), (x2, y2))
 
-    label_font = pygame.font.Font("fonts/arcadeclassic.regular.ttf", 24)
     for i in range(0, MAX_SPEED + 1, 20):
         angle = speedToAngle(i)
         label_radius = radius - 35
         lx = center[0] + label_radius * math.cos(angle)
         ly = center[1] - label_radius * math.sin(angle)
 
-        label = label_font.render(str(i), True, white)
+        label = font.render(str(i), True, white)
         label_rect = label.get_rect(center=(lx, ly))
         surface.blit(label, label_rect)
     
@@ -74,19 +76,19 @@ def drawSpeedometer(surface, speed):
 #tachometer
 MIN_RPM = 0
 MAX_RPM = 8000
-REDLINE_RPM = 6700
+REDLINE_RPM = 7000
 BAR_WIDTH = 20
 BAR_HEIGHT = 400
 BAR_X = 100
 BAR_Y = 100
+TICK_WIDTH = 10
 
 def drawTachometer(surface, rpm):
     pygame.draw.rect(surface, white, (BAR_X, BAR_Y, BAR_WIDTH, BAR_HEIGHT))
 
-    
     #drawing redline area
-    redline_fill = int(BAR_HEIGHT * (6700/8000))
-    pygame.draw.rect(surface, white, (BAR_X, BAR_Y, BAR_WIDTH, redline_fill))
+    redline_fill = int(BAR_HEIGHT * (1300 / 8000))
+    pygame.draw.rect(surface, red, (BAR_X, BAR_Y, BAR_WIDTH, redline_fill))
 
     ratio = rpm / MAX_RPM
     fill_height = int(BAR_HEIGHT * ratio)
@@ -99,14 +101,30 @@ def drawTachometer(surface, rpm):
     
     pygame.draw.rect(surface, color, (BAR_X, fill_y, BAR_WIDTH, fill_height))
 
-    label_font = pygame.font.Font("fonts/arcadeclassic.regular.ttf", 24)
-    title = label_font.render("RPM", True, white)
-    title_rect = title.get_rect(center=((BAR_X + BAR_WIDTH // 2), 80))
+    #drawing tick marks
+    for i in range(0, MAX_RPM, 1000):
+        ratio = i / MAX_RPM
+        tick_height = int(BAR_HEIGHT * ratio)
+        tick_y = BAR_Y + BAR_HEIGHT - tick_height
+
+        pygame.draw.line(surface, black, (BAR_X, tick_y), (BAR_X + TICK_WIDTH, tick_y))
+        
+        tick_label = font.render(f"{(i // 1000)}", True, white)
+        tick_rect = tick_label.get_rect(center=((BAR_X - 15), tick_y))
+        surface.blit(tick_label, tick_rect)
+
+    title = font.render("RPM", True, white)
+    title_rect = title.get_rect(center=((BAR_X + BAR_WIDTH // 2), (BAR_Y - 20)))
     surface.blit(title, title_rect)
 
+    rpm_label = font.render(f"{rpm}", True, white)
+    rpm_rect = rpm_label.get_rect(center=((BAR_X + BAR_WIDTH //2), (BAR_Y + BAR_HEIGHT + 20)))
+    surface.blit(rpm_label, rpm_rect)
 
 
 
+
+#defaults / debug
 rpm = 0
 speed = 0
 flip = 1
@@ -136,6 +154,6 @@ while running:
         flip = 1
     
     speed += flip
-    rpm += flip * 50
+    rpm += flip * 60
 
 pygame.quit()
